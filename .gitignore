@@ -1,0 +1,5 @@
+*.bz2
+*.log
+*.bak
+*.box
+.vagrant
