@@ -22,28 +22,42 @@ apt-fast update
 apt-fast install -y ubuntu-gnome-desktop htop virtualbox-guest-utils virtualbox-guest-x11 virtualbox-guest-dkms
 
 # Download the KaiOS development environment
+echo "Downloading the KaiOS development environment..."
 aria2c -x4 "https://developer.kaiostech.com/simulator/linux"
 tar jxvf *.tar.bz2
 cd kaiosrt*
 tar jxvf *.tar.bz2
 mv kaiosrt /home/vagrant/
 
+# Enable automatic login
+sed -i 's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/' /etc/gdm3/custom.conf
+sed -i 's/.*AutomaticLogin = user1/AutomaticLogin = vagrant/' /etc/gdm3/custom.conf
+
 # Make an auto-start link
 mkdir -p /home/vagrant/.config/autostart/
 cat << EOF > /home/vagrant/.config/autostart/KaiOS.desktop
 [Desktop Entry]
 Type=Application
-Exec=/home/vagrant/kaiosrt/kaiosrt
+Exec=/home/vagrant/kaiosrt/kaiosrt-bin
 Hidden=false
 X-GNOME-Autostart-enabled=true
 Name=kaiosrt
 Comment=KaiOS Development
 EOF
-gio set /home/vagrant/.config/autostart/KaiOS.desktop "metadata::trusted" yes
 
-# Enable automatic login
-sed -i 's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/' /etc/gdm3/custom.conf
-sed -i 's/.*AutomaticLogin = user1/AutomaticLogin = vagrant/' /etc/gdm3/custom.conf
+# Make a generic link for the menu
+mkdir -p /home/vagrant/.local/share/applications
+cat << EOF > /home/vagrant/.local/share/applications/KaiOS.desktop
+[Desktop Entry]
+Type=Application
+Exec=/home/vagrant/kaiosrt/kaiosrt-bin
+Hidden=false
+Name=kaiosrt
+Comment=KaiOS Development
+EOF
+
+# Prevent legal motd from 
+rm -rf /home/vagrant/.cache/motd.legal-displayed
 
 # Reboot to start the window manager
 sudo reboot
