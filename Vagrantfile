@@ -1,9 +1,18 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+def local_cache(box_name)
+  cache_dir = File.join(File.expand_path(File.dirname(__FILE__)), '.vagrant', 'cache', 'apt', box_name)
+  partial_dir = File.join(cache_dir, 'partial')
+  FileUtils.mkdir_p(partial_dir) unless File.exists? partial_dir
+  cache_dir
+end
+
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
-  # config.vm.network "forwarded_port", guest: 6000, host: 6000, host_ip: "127.0.0.1"
+
+  cache_dir = local_cache(config.vm.box)
+  config.vm.synced_folder cache_dir, "/var/cache/apt/archives/"
 
   config.vm.provider "virtualbox" do |vb|
     vb.name = "KaiOS_Dev"
