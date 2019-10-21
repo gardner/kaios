@@ -21,6 +21,11 @@ Vagrant.configure("2") do |config|
     vb.memory = "4096"
     vb.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
     vb.customize ['modifyvm', :id, '--draganddrop', 'bidirectional']
+
+    # See https://stackoverflow.com/questions/38956127/usb-device-is-not-visible-inside-vagrant/39014465#39014465
+    vb.customize ["modifyvm", :id, "--usb", "on"]
+    vb.customize ["modifyvm", :id, "--usbehci", "on"]
+    vb.customize ["usbfilter", "add", "0", "--target", :id, "--name", "Nokia 8110 4G", '--vendorid', '0x05c6', '--productid', '0x9091']
   end
 
   config.vm.provision "shell", path: "provision.sh"

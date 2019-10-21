@@ -33,6 +33,17 @@ mv kaiosrt /home/vagrant/
 sed -i 's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/' /etc/gdm3/custom.conf
 sed -i 's/.*AutomaticLogin = user1/AutomaticLogin = vagrant/' /etc/gdm3/custom.conf
 
+# Ensure that the vagrant user has access to the USB device
+cat << EOF > /etc/udev/rules.d/51-android.rules
+SUBSYSTEM=="usb", ATTR{idVendor}=="05c6", ATTR{idProduct}=="9091", MODE="0600", OWNER="vagrant"
+EOF
+
+# Setup adb to look for the banana phone
+mkdir -p /home/vagrant/.android
+cat << EOF > /home/vagrant/.android/adb_usb.ini
+05c6:9091
+EOF
+
 # Make an auto-start link
 mkdir -p /home/vagrant/.config/autostart/
 cat << EOF > /home/vagrant/.config/autostart/KaiOS.desktop
@@ -55,9 +66,6 @@ Hidden=false
 Name=kaiosrt
 Comment=KaiOS Development
 EOF
-
-# Prevent legal motd from 
-rm -rf /home/vagrant/.cache/motd.legal-displayed
 
 # Reboot to start the window manager
 sudo reboot
